@@ -1,0 +1,25 @@
+{
+  "callbacks": "<class '__main__.MyCustomCallbacks'>",
+  "env": "<class '__main__.SimpleEnv'>",
+  "env_config": {
+    "mode": "train",
+    "reload_template": "[[255 255 255 ... 255 255 255]\n [255 255 255 ... 255 255 255]\n [255 255 255 ... 255 255 255]\n ...\n [255 255 255 ... 255 255 255]\n [255 255 255 ... 255 255 255]\n [255 255 255 ... 255 255 255]]"
+  },
+  "evaluation_config": {
+    "env_config": {
+      "mode": "test"
+    }
+  },
+  "framework": "torch",
+  "learning_starts": 0,
+  "model": {
+    "conv_filters": null,
+    "custom_model": "fcnet",
+    "fcnet_hiddens": [
+      1
+    ]
+  },
+  "n_step": 4,
+  "num_gpus": 1,
+  "num_workers": 0
+}

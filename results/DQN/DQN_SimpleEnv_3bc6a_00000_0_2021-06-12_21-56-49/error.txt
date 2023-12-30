@@ -1,0 +1,113 @@
+Failure # 1 (occurred at 2021-06-12_21-56-52)
+Traceback (most recent call last):
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/tune/trial_runner.py", line 718, in _process_trial
+    results = self.trial_executor.fetch_result(trial)
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/tune/ray_trial_executor.py", line 688, in fetch_result
+    result = ray.get(trial_future[0], timeout=DEFAULT_GET_TIMEOUT)
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/_private/client_mode_hook.py", line 62, in wrapper
+    return func(*args, **kwargs)
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/worker.py", line 1494, in get
+    raise value.as_instanceof_cause()
+ray.exceptions.RayTaskError(ValueError): [36mray::DQN.train_buffered()[39m (pid=25322, ip=192.168.100.8)
+  File "python/ray/_raylet.pyx", line 501, in ray._raylet.execute_task
+  File "python/ray/_raylet.pyx", line 451, in ray._raylet.execute_task.function_executor
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/_private/function_manager.py", line 563, in actor_method_executor
+    return method(__ray_actor, *args, **kwargs)
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/tune/trainable.py", line 173, in train_buffered
+    result = self.train()
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/rllib/agents/trainer.py", line 608, in train
+    raise e
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/rllib/agents/trainer.py", line 594, in train
+    result = Trainable.train(self)
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/tune/trainable.py", line 232, in train
+    result = self.step()
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/rllib/agents/trainer_template.py", line 173, in step
+    res = next(self.train_exec_impl)
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/util/iter.py", line 756, in __next__
+    return next(self.built_iterator)
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/util/iter.py", line 783, in apply_foreach
+    for item in it:
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/util/iter.py", line 843, in apply_filter
+    for item in it:
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/util/iter.py", line 843, in apply_filter
+    for item in it:
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/util/iter.py", line 783, in apply_foreach
+    for item in it:
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/util/iter.py", line 843, in apply_filter
+    for item in it:
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/util/iter.py", line 1075, in build_union
+    item = next(it)
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/util/iter.py", line 756, in __next__
+    return next(self.built_iterator)
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/util/iter.py", line 783, in apply_foreach
+    for item in it:
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/util/iter.py", line 783, in apply_foreach
+    for item in it:
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/util/iter.py", line 783, in apply_foreach
+    for item in it:
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/rllib/execution/rollout_ops.py", line 74, in sampler
+    yield workers.local_worker().sample()
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/rllib/evaluation/rollout_worker.py", line 726, in sample
+    batches = [self.input_reader.next()]
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/rllib/evaluation/sampler.py", line 99, in next
+    batches = [self.get_data()]
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/rllib/evaluation/sampler.py", line 226, in get_data
+    item = next(self.rollout_provider)
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/rllib/evaluation/sampler.py", line 616, in _env_runner
+    sample_collector=sample_collector,
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/rllib/evaluation/sampler.py", line 811, in _process_observations
+    policy_id).transform(raw_obs)
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/rllib/models/preprocessors.py", line 187, in transform
+    self.check_shape(observation)
+  File "/home/jack/miniconda3/envs/dyno/lib/python3.7/site-packages/ray/rllib/models/preprocessors.py", line 68, in check_shape
+    observation, self._obs_space)
+ValueError: ('Observation ({}) outside given space ({})!', array([[[0.        , 0.        , 0.        , 0.        ],
+        [0.        , 0.        , 0.        , 0.        ],
+        [0.        , 0.        , 0.00392157, 0.        ],
+        ...,
+        [0.        , 0.        , 0.        , 0.        ],
+        [0.        , 0.        , 0.        , 0.        ],
+        [0.        , 0.        , 0.        , 0.        ]],
+
+       [[0.        , 0.        , 0.        , 0.        ],
+        [0.        , 0.        , 0.        , 0.        ],
+        [0.        , 0.        , 0.        , 0.        ],
+        ...,
+        [0.        , 0.        , 0.        , 0.        ],
+        [0.        , 0.        , 0.        , 0.        ],
+        [0.        , 0.        , 0.        , 0.        ]],
+
+       [[0.        , 0.        , 0.        , 0.        ],
+        [0.        , 0.        , 0.        , 0.        ],
+        [0.        , 0.        , 0.        , 0.        ],
+        ...,
+        [0.        , 0.        , 0.        , 0.        ],
+        [0.        , 0.        , 0.        , 0.        ],
+        [0.        , 0.        , 0.        , 0.        ]],
+
+       ...,
+
+       [[0.32941176, 0.18823529, 0.30980392, 0.15294118],
+        [0.30196078, 0.19215686, 0.30980392, 0.21568627],
+        [0.30588235, 0.3372549 , 0.30588235, 0.10196078],
+        ...,
+        [0.45490196, 0.        , 0.30196078, 0.        ],
+        [0.50196078, 0.13333333, 0.22352941, 0.        ],
+        [0.39607843, 0.11764706, 0.14509804, 0.        ]],
+
+       [[0.01960784, 0.02352941, 0.01568627, 0.09803922],
+        [0.01568627, 0.09803922, 0.01960784, 0.01176471],
+        [0.01568627, 0.1372549 , 0.01568627, 0.09019608],
+        ...,
+        [0.25882353, 0.        , 0.00784314, 0.        ],
+        [0.34509804, 0.14117647, 0.02352941, 0.        ],
+        [0.26666667, 0.12156863, 0.09411765, 0.        ]],
+
+       [[0.        , 0.00784314, 0.        , 0.        ],
+        [0.        , 0.        , 0.        , 0.        ],
+        [0.        , 0.        , 0.        , 0.        ],
+        ...,
+        [0.1254902 , 0.        , 0.        , 0.        ],
+        [0.11764706, 0.        , 0.        , 0.        ],
+        [0.11764706, 0.        , 0.        , 0.        ]]]), Box(-10.0, 10.0, (42, 42, 16), float32))
+
