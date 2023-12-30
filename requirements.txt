@@ -1,3 +1,5 @@
+#python==3.7
+torch
 ray[tune]
 ray[rllib]
 gym
@@ -7,3 +9,6 @@ dm-tree
 keyboard
 lz4
 matplotlib
+keyboard
+pyyaml
+scipy

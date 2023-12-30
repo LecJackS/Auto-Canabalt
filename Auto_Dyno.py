@@ -117,10 +117,9 @@ class SimpleEnv(gym.Env):
 
         # Setting the points for cropped image
         self.left = 0
-        self.top = 0#int(height * 3 / 4)
+        self.top = 0  # int(height * 3 / 4)
         self.right = width
-        self.bottom = height#int(height * 3 / 4) + 1
-
+        self.bottom = height  # int(height * 3 / 4) + 1
 
         # Observation stats
         resize_scale = 0.2625  # (0, 1]
@@ -143,12 +142,13 @@ class SimpleEnv(gym.Env):
         self.last_observation = np.zeros((obs_width, obs_height))
         self.last_n_observations = np.zeros(self.obsDim)
 
-
         self.num_sticking_frames = 8
         self.stick_countdown = self.num_sticking_frames
         self.stack_countdown = self.num_stacking_frames
         # To keep order of frames
         self.count_indexes = np.zeros(self.num_stacking_frames)
+
+        self.file_num = 0
 
     def step(self, action):
         if self.done:
@@ -185,7 +185,6 @@ class SimpleEnv(gym.Env):
             # Keep seeing previous observation
             obs_state = self.last_observation
 
-
         # if self.mode == 'train':
         #     # Best strategy: Choose bigger action
         #     reward = 0.2 * action
@@ -203,27 +202,25 @@ class SimpleEnv(gym.Env):
             keyboard.press_and_release('space')
         else:
             if not sticked:
-                reward = 1 #+ int(action == 0)
+                reward = 1  # + int(action == 0)
             else:
                 # Do not give reward for observations in sticked actions
                 reward = 0
 
         # Pause
-        #time.sleep(0.2)
+        # time.sleep(0.2)
 
         return obs_state, reward, self.done, {}
 
     def get_obs(self):
-        pil_screenshot_for_reload = ImageGrab.grab(bbox=(self.top_left_x,     self.top_left_y,
-                                         self.bottom_right_x, self.bottom_right_y))
+        pil_screenshot_for_reload = ImageGrab.grab(bbox=(self.top_left_x, self.top_left_y,
+                                                         self.bottom_right_x, self.bottom_right_y))
 
         width, height = pil_screenshot_for_reload.size
 
-
-
         # Cropped image of above dimension
         # (It will not change orginal image)
-        pil_screenshot_for_observation = pil_screenshot_for_reload#.crop((self.left, self.top, self.right, self.bottom))
+        pil_screenshot_for_observation = pil_screenshot_for_reload  # .crop((self.left, self.top, self.right, self.bottom))
 
         # Convert to opencv to use template search. TODO: Check if could use only OpenCV (no PIL)
         open_cv_image = cv2.cvtColor(np.array(pil_screenshot_for_reload), cv2.COLOR_RGB2GRAY)
@@ -235,22 +232,25 @@ class SimpleEnv(gym.Env):
         # res = cv2.imwrite("./img/img-{}.png".format(time.time()), open_cv_image)
         # print("> > > res:", res)
 
-
         pil_screenshot_for_observation = ImageOps.grayscale(pil_screenshot_for_observation)
         pil_screenshot_for_observation = ImageOps.autocontrast(pil_screenshot_for_observation)
         pil_screenshot_for_observation = resize_pil(pil_screenshot_for_observation)
 
+        pil_screenshot_for_observation.save("{}.png".format(self.file_num))
+        self.file_num += 1
+
         # For debugging
-        show_input_img = False
-        if show_input_img:
+        show_input_img = True
+        if show_input_img and self.file_num < 10:
             pil_screenshot_for_observation.show()
-            assert False, "This only works for 1 img, to not have many windows being opened"
+        elif self.file_num < 10:
+            assert False, "This only works for 10 imgs, to not have many windows being opened"
 
         # Reshape / downsample observed image
         obs_h = self.obsDim[0]
         obs_w = self.obsDim[1]
-        #assert obs_w == 4*obs_h, "Width should be EXACTLY 4 times the height. Now is: w={} x h={}".format(obs_w,obs_h)
-        #obs_state = np.reshape(np.array(pil_screenshot_for_observation.getdata()), (obs_w, obs_h))
+        # assert obs_w == 4*obs_h, "Width should be EXACTLY 4 times the height. Now is: w={} x h={}".format(obs_w,obs_h)
+        # obs_state = np.reshape(np.array(pil_screenshot_for_observation.getdata()), (obs_w, obs_h))
         obs_state = np.reshape(np.array(pil_screenshot_for_observation.getdata()), (obs_w, obs_h * self.image_parts))
         # Normalize
         obs_state = obs_state / 255.
@@ -258,12 +258,17 @@ class SimpleEnv(gym.Env):
         print(obs_state.shape)
         # Overwrite oldest observation (84, 84, 4)
         # Separate each image into two
-        self.last_n_observations[:, :, self.count % (self.image_parts * self.num_stacking_frames) + 0] = obs_state[:, :obs_h]
-        self.last_n_observations[:, :, self.count % (self.image_parts * self.num_stacking_frames) + 1] = obs_state[:, obs_h:2*obs_h]
-        self.last_n_observations[:, :, self.count % (self.image_parts * self.num_stacking_frames) + 2] = obs_state[:, 2*obs_h:3*obs_h]
-        self.last_n_observations[:, :, self.count % (self.image_parts * self.num_stacking_frames) + 3] = obs_state[:, 3*obs_h:]
+        self.last_n_observations[:, :, self.count % (self.image_parts * self.num_stacking_frames) + 0] = obs_state[:,
+                                                                                                         :obs_h]
+        self.last_n_observations[:, :, self.count % (self.image_parts * self.num_stacking_frames) + 1] = obs_state[:,
+                                                                                                         obs_h:2 * obs_h]
+        self.last_n_observations[:, :, self.count % (self.image_parts * self.num_stacking_frames) + 2] = obs_state[:,
+                                                                                                         2 * obs_h:3 * obs_h]
+        self.last_n_observations[:, :, self.count % (self.image_parts * self.num_stacking_frames) + 3] = obs_state[:,
+                                                                                                         3 * obs_h:]
 
-        self.count_indexes[self.count % self.num_stacking_frames] = self.count # TODO: this is only taking into account the frames but not the parts
+        self.count_indexes[
+            self.count % self.num_stacking_frames] = self.count  # TODO: this is only taking into account the frames but not the parts
         print(obs_state.shape)
         # Return frames in correct temporal order
         return self.last_n_observations[:, :, np.argsort(self.count_indexes)]
@@ -293,7 +298,6 @@ class SimpleEnv(gym.Env):
         self.done = False
         self.stick_countdown = self.num_sticking_frames
 
-
         obs_state = self.get_obs()
 
         if self.done:
@@ -306,7 +310,7 @@ class SimpleEnv(gym.Env):
 # In[7]:
 
 
-# my_env = SimpleEnv(config={'mode':'train'})
+# my_env = ControllerEnv(config={'mode':'train'})
 #
 #
 # # Play at random:
@@ -332,7 +336,7 @@ class SimpleEnv(gym.Env):
 # In[25]:
 def resize_cv2(img):
     scale = 0.2625
-    width = max(1, int(img.shape[1] * scale)) # At least 1 pixel
+    width = max(1, int(img.shape[1] * scale))  # At least 1 pixel
     height = max(1, int(img.shape[0] * scale))
     resized = cv2.resize(img, (width, height), interpolation=cv2.INTER_AREA)
     return resized
@@ -341,15 +345,16 @@ def resize_cv2(img):
 def resize_pil(img):
     scale = 0.2625
     width, height = img.size
-    width = max(1, int(width * scale)) # At least 1 pixel
+    width = max(1, int(width * scale))  # At least 1 pixel
     height = max(1, int(height * scale))
     resized = img.resize((width, height), PIL.Image.LANCZOS)
     return resized
 
+
 # Load game over template image
 template = cv2.imread("./img/game_over.png", 0)  # 0: To grayscale
 assert template is not None, "Game Over image file not found!"
-#template = resize_cv2(template)
+# template = resize_cv2(template)
 
 my_config = {"env": SimpleEnv,
              "callbacks": MyCustomCallbacks,
@@ -360,10 +365,10 @@ my_config = {"env": SimpleEnv,
              "evaluation_config": {"env_config": {'mode': 'test'}},
              "num_gpus": 0,
              "learning_starts": 0,
-             "model":{
-                # "fcnet_hiddens": [],
-                # "conv_filters": [[32, 4, 4], [64, 2, 4], [64, 2, 4]],
-                #"post_fcnet_hiddens": [32, 32],
+             "model": {
+                 # "fcnet_hiddens": [],
+                 # "conv_filters": [[32, 4, 4], [64, 2, 4], [64, 2, 4]],
+                 # "post_fcnet_hiddens": [32, 32],
 
              },
              "n_step": 4,
@@ -406,7 +411,7 @@ if __name__ == "__main__":
                        # checkpoint_score_attr='custom_metrics/test_return_mean'
                        # checkpoint_score_attr='test_return_mean' # Doesn't work either
                        checkpoint_score_attr='training_iteration',
-                       local_dir="/home/jack/Auto Canabalt/results",
+                       local_dir="/home/jack/Auto-Canabalt/results",
                        # name="all"
                        )
 
